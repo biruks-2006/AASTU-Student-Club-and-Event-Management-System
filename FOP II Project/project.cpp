@@ -39,7 +39,7 @@ test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
 sql = "CREATE TABLE IF NOT EXISTS Event (event_id integer primary key,club_id integer, title text, description text, date integer,month integer, year integer, foreign key(club_id) references Club(c_id) ON DELETE SET NULL);";
 test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
 
-sql = "CREATE TABLE IF NOT EXISTS membership (s_id integer primary key,club_id integer, date integer,month integer, year integer, foreign key(club_id) references Club(c_id) ON DELETE SET NULL);";
+sql = "CREATE TABLE IF NOT EXISTS membership (s_id integer, club_id integer, date integer, month integer, year integer, PRIMARY KEY(s_id, club_id), foreign key(club_id) references Club(c_id));";
 test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
 
 sql = "CREATE TABLE IF NOT EXISTS Attendance (club_id INTEGER, s_id INTEGER, condition TEXT, PRIMARY KEY (club_id, s_id), FOREIGN KEY (club_id) REFERENCES Club(c_id) ON DELETE SET NULL, FOREIGN KEY (s_id) REFERENCES Student(s_id) ON DELETE SET NULL);";
@@ -98,7 +98,7 @@ void Record_Attendance(student s[], club c[], int size){
     for(int i=0;i<size;i++){
         cout<<"Enter Member "<<i+1<<" Student ID, Club ID and Presence status respectively: ";
         cin>>s[i].s_id>>c[i].c_id>>condition[i];
-        sql="INSERT INTO Attendance VALUES(" + to_string(s[i].s_id) + ", " + to_string(c[i].c_id) + ", '" + condition[i] + "');";
+        sql = "INSERT INTO Attendance VALUES(" + to_string(c[i].c_id) + ", " + to_string(s[i].s_id) + ", '" + condition[i] + "');";
         test=sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
     }
 }
@@ -165,7 +165,7 @@ int main(){
         cout<<"how many students do you want to register: ";
         cin>>n;
         Register(s,n);
-        cout<<"would you like to reister clubs also(y/n)? ";
+        cout<<"would you like to register clubs also(y/n)? ";
         cin>>ch;
         if(ch=='y'){
         cout<<"how many clubs do you want to register: ";
@@ -174,7 +174,7 @@ int main(){
         else if(ch=='n'){
         break;}
         else
-        cout<<"invalid input";
+        cout<<"invalid input.";
         break;
         
         case 2:
@@ -206,20 +206,19 @@ int main(){
         break;
 
         default:
-        cout<<"invalid input please try again ";
+        cout<<"invalid input please try again.";
         continue;
         break;
     }
     again:
-    cout<<"would like to go again(y/n): ";
+    cout<<"would you like to go again(y/n): ";
     cin>>ch;
     if(ch=='n')
     trial=false;
     else if(ch!='y' and ch!='n'){
-    cout<<"error in  valid input try again.\n";
+    cout<<"error invalid input try again.\n";
     goto again;
     }
-
     }
     return 0;
 }
