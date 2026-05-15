@@ -1,5 +1,14 @@
 AASTU Student Club and Event Management System
 
+| No. | Full Name       | ID Number   |
+| :-- | :-------------- | :---------- |
+| 1   | Beka Solomon    | ETS 0242/17 |
+| 2   | Deborah Mesfin  | ETS 0434/17 |
+| 3   | Biruk Molla     | ETS 0336/17 |
+| 4   | Abreham Teshale | ETS 0076/17 |
+| 5   | Awach Garang    | ETS 1869/17 |
+| 6   | Gakeer Deng     | ETS 1865/17 |
+
 A console-based C++ application developed for managing student clubs, memberships, and campus events at Addis Ababa Science and Technology University.
 The system is designed to replace paper-based club management with a digital and organized solution using advanced C++ programming concepts such as structures, STL, modular programming, and file handling.
 
