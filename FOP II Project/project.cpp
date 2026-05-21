@@ -39,7 +39,7 @@ test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
 sql = "CREATE TABLE IF NOT EXISTS Event (event_id integer primary key,club_id integer, title text, description text, date integer,month integer, year integer, foreign key(club_id) references Club(c_id) ON DELETE SET NULL);";
 test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
 
-sql = "CREATE TABLE IF NOT EXISTS membership (s_id integer, club_id integer, date integer, month integer, year integer, PRIMARY KEY(s_id, club_id), foreign key(club_id) references Club(c_id));";
+sql = "CREATE TABLE IF NOT EXISTS membership (s_id integer primary key,club_id integer, date integer,month integer, year integer,  foreign key(club_id) references Club(c_id) ON DELETE SET NULL);";
 test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
 
 sql = "CREATE TABLE IF NOT EXISTS Attendance (club_id INTEGER, s_id INTEGER, condition TEXT, PRIMARY KEY (club_id, s_id), FOREIGN KEY (club_id) REFERENCES Club(c_id) ON DELETE SET NULL, FOREIGN KEY (s_id) REFERENCES Student(s_id) ON DELETE SET NULL);";
@@ -98,7 +98,7 @@ void Record_Attendance(student s[], club c[], int size){
     for(int i=0;i<size;i++){
         cout<<"Enter Member "<<i+1<<" Student ID, Club ID and Presence status respectively: ";
         cin>>s[i].s_id>>c[i].c_id>>condition[i];
-        sql = "INSERT INTO Attendance VALUES(" + to_string(c[i].c_id) + ", " + to_string(s[i].s_id) + ", '" + condition[i] + "');";
+        sql="INSERT INTO Attendance VALUES(" + to_string(s[i].s_id) + ", " + to_string(c[i].c_id) + ", '" + condition[i] + "');";
         test=sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
     }
 }
@@ -146,6 +146,138 @@ void Generate_report() {
 
 }
 
+void Delete_Record() {
+    int choice, id;
+    cout << "\n--- Delete Menu ---\n";
+    cout << "1) Delete Student\n";
+    cout << "2) Delete Club\n";
+    cout << "3) Delete Event\n";
+    cout << "4) Delete Membership\n";
+    cout << "5) Delete Attendance\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    
+    switch(choice) {
+        case 1:
+            cout << "Enter Student ID: ";
+            cin >> id;
+            sql = "DELETE FROM Student WHERE s_id = " + to_string(id) + ";";
+            break;
+        case 2:
+            cout << "Enter Club ID: ";
+            cin >> id;
+            sql = "DELETE FROM Club WHERE c_id = " + to_string(id) + ";";
+            break;
+        case 3:
+            cout << "Enter Event ID: ";
+            cin >> id;
+            sql = "DELETE FROM Event WHERE event_id = " + to_string(id) + ";";
+            break;
+        case 4:
+            cout << "Enter Student ID: ";
+            cin >> id;
+            sql = "DELETE FROM membership WHERE s_id = " + to_string(id) + ";";
+            break;
+        case 5:
+            cout << "Enter Student ID: ";
+            cin >> id;
+            sql = "DELETE FROM Attendance WHERE s_id = " + to_string(id) + ";";
+            break;
+        default:
+            cout << "Invalid choice!" << endl;
+            return;
+    }
+    
+    test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
+    
+    if (test == SQLITE_OK)
+        cout << "Record deleted successfully!" << endl;
+    else
+        cout << "Error: " << errMsg << endl;
+}
+
+void Update_Record() {
+    int choice, id, new_int;
+    string new_string;
+    
+    cout << "\n--- Update Menu ---\n";
+    cout << "1) Update Student\n";
+    cout << "2) Update Club\n";
+    cout << "3) Update Event\n";
+    cout << "4) Update Attendance Status\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    
+    switch(choice) {
+        case 1: { // Update Student
+            cout << "Enter Student ID: ";
+            cin >> id;
+            cout << "Enter new name: ";
+            cin >> new_string;
+            cout << "Enter new department: ";
+            string dept;
+            cin >> dept;
+            sql = "UPDATE Student SET name = '" + new_string + "', dept = '" + dept + 
+                  "' WHERE s_id = " + to_string(id) + ";";
+            break;
+        }
+        case 2: { // Update Club
+            cout << "Enter Club ID: ";
+            cin >> id;
+            cout << "Enter new name: ";
+            cin >> new_string;
+            cout << "Enter new description: ";
+            string desc;
+            cin >> desc;
+            cout << "Enter new leader ID: ";
+            cin >> new_int;
+            sql = "UPDATE Club SET name = '" + new_string + "', description = '" + desc + 
+                  "', leader_id = " + to_string(new_int) + " WHERE c_id = " + to_string(id) + ";";
+            break;
+        }
+        case 3: { // Update Event
+            cout << "Enter Event ID: ";
+            cin >> id;
+            cout << "Enter new title: ";
+            cin >> new_string;
+            cout << "Enter new description: ";
+            string desc;
+            cin >> desc;
+            cout << "Enter new date (day month year): ";
+            int d, m, y;
+            cin >> d >> m >> y;
+            sql = "UPDATE Event SET title = '" + new_string + "', description = '" + desc + 
+                  "', date = " + to_string(d) + ", month = " + to_string(m) + 
+                  ", year = " + to_string(y) + " WHERE event_id = " + to_string(id) + ";";
+            break;
+        }
+        case 4: { // Update Attendance
+            int student_id, club_id;
+            string status;
+            cout << "Enter Student ID: ";
+            cin >> student_id;
+            cout << "Enter Club ID: ";
+            cin >> club_id;
+            cout << "Enter new status (Present/Absent/Late): ";
+            cin >> status;
+            sql = "UPDATE Attendance SET condition = '" + status + 
+                  "' WHERE s_id = " + to_string(student_id) + 
+                  " AND club_id = " + to_string(club_id) + ";";
+            break;
+        }
+        default:
+            cout << "Invalid choice!" << endl;
+            return;
+    }
+    
+    test = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
+    
+    if (test == SQLITE_OK)
+        cout << "Record updated successfully!" << endl;
+    else
+        cout << "Error: " << errMsg << endl;
+}
+
 
 int main(){
 
@@ -155,9 +287,9 @@ int main(){
 
     create_db();
     cout<<"Welcome to AASTU Club Managemnet System Service Menu\nPlease choose which one of the following services you want to get\n";
-
+    
     while(trial){
-    cout<<"1)Register students and clubs\n2)Create Event\n3)Join Club\n4)Record Attendance\n5)Generate Report\n6)Save and Exit"<<endl;
+    cout<<"1)Register students and clubs\n2)Create Event\n3)Join Club\n4)Record Attendance\n5)Generate Report\n6)Update a record\n7)delete a record\n8)Save and Exit"<<endl;
     cin>>choice;
     switch(choice){
         case 1:
@@ -165,7 +297,7 @@ int main(){
         cout<<"how many students do you want to register: ";
         cin>>n;
         Register(s,n);
-        cout<<"would you like to register clubs also(y/n)? ";
+        cout<<"would you like to reister clubs also(y/n)? ";
         cin>>ch;
         if(ch=='y'){
         cout<<"how many clubs do you want to register: ";
@@ -174,7 +306,7 @@ int main(){
         else if(ch=='n'){
         break;}
         else
-        cout<<"invalid input.";
+        cout<<"invalid input";
         break;
         
         case 2:
@@ -201,24 +333,35 @@ int main(){
         break;
 
         case 6:
+        Update_Record();
+        break;
+
+        case 7:
+        Delete_Record();
+        break;
+
+        case 8:
         cout<<"Thankyou for using our system, wishing you great time\n Good Bye;)";
         return 0;
         break;
 
         default:
-        cout<<"invalid input please try again.";
+        cout<<"invalid input please try again ";
         continue;
         break;
     }
     again:
-    cout<<"would you like to go again(y/n): ";
+    cout<<"would like to go again(y/n): ";
     cin>>ch;
-    if(ch=='n')
+    if(ch=='n'){
     trial=false;
+    cout<<"Thankyou for using our system, wishing you great time\n Good Bye;)";
+    }
     else if(ch!='y' and ch!='n'){
-    cout<<"error invalid input try again.\n";
+    cout<<"error in  valid input try again.\n";
     goto again;
     }
+
     }
     return 0;
 }
